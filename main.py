@@ -7,7 +7,7 @@ from tempfile import NamedTemporaryFile
 
 # Load the pre-trained deepfake detection model
 try:
-    model_path = r'C:\Users\loku0\OneDrive\Desktop\DeepFake\DeepFake_Model.h5'
+    model_path = r'C:\Users\loku0\OneDrive\Desktop\DeepFake\DeepFake_Model.h5' #Enter the path of model from your directory
     model = load_model(model_path)
 except OSError:
     st.error("Error loading the model. Please check if the file exists and is not corrupted.")
@@ -71,8 +71,8 @@ def classify_video(video_path, frame_skip=10):
     return video_result, real_count, fake_count, avg_conf_real, avg_conf_fake, total_frames
 
 # Streamlit app
-st.title('🎥 DeepFake Detection')
-st.markdown("Welcome to the **DeepFake Detection **, where you can upload a video to determine whether it is real or fake.")
+st.title('🎥 DeepFake Detection 🎭')
+st.markdown("Welcome to the DeepFake Detection, where you can upload a video to determine whether it is real or fake.")
 
 # Upload a video file
 uploaded_file = st.file_uploader("📁 Upload your video file:", type=["mp4", "mov", "avi"])
@@ -97,7 +97,6 @@ if uploaded_file is not None:
     st.write("### 📊 **Detailed Statistics**")
     col1, col2 = st.columns(2)
     with col1:
-        st.metric("Total Frames Processed", total_frames)
         st.metric("Real Frames Count", real_count)
         st.metric("Fake Frames Count", fake_count)
 
