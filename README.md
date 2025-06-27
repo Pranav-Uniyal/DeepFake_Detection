@@ -79,6 +79,10 @@ Deepfake-Detection(Repo)
 ```
 
 ---
+## Download the Model
+Releases-[Download](https://github.com/Pranav-Uniyal/DeepFake_Detection/releases/tag/v1.0)
+
+---
 
 ## 📊 Output
 
