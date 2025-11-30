@@ -4,9 +4,9 @@
 A **Streamlit-based web application** to detect deepfake videos using a CNN model. This tool analyzes frames of a video and determines whether the video is **real** or **fake** using majority voting and confidence scoring.
 
 ---
-<img width="511" height="240" alt="image" src="https://github.com/user-attachments/assets/2760b98e-ac25-44a9-be3d-08c2dde64d25" />
-
 # [Kaggle Notebook Link](https://www.kaggle.com/code/fall2fire/deepfake-detection-96-accuracy)
+[<img width="511" height="240" alt="image" src="https://github.com/user-attachments/assets/2760b98e-ac25-44a9-be3d-08c2dde64d25" />](https://www.kaggle.com/code/fall2fire/deepfake-detection-96-accuracy)
+
 ---
 ## 📽️ Demo
 ![image](https://github.com/user-attachments/assets/3c15ea39-3e8d-41fd-82b8-ee6fb8176517)
