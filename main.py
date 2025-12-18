@@ -1,106 +1,143 @@
 import streamlit as st
 import cv2
 import numpy as np
+import os
 from tensorflow.keras.models import load_model
-from collections import Counter
 from tempfile import NamedTemporaryFile
 
-# Load the pre-trained deepfake detection model
+# -------------------------------
+# Streamlit Page Config
+# -------------------------------
+st.set_page_config(
+    page_title="DeepFake Detection",
+    page_icon="🎥",
+    layout="centered"
+)
+
+# -------------------------------
+# Load Model (SAFE)
+# -------------------------------
+MODEL_PATH = "dfd-model.h5"
+
+if not os.path.exists(MODEL_PATH):
+    st.error("❌ Model file not found. Please ensure 'dfd-model.h5' is in the repository.")
+    st.stop()
+
 try:
-    model_path = r'dfd-model.h5' #Enter the path of model from your directory
-    model = load_model(model_path)
-except OSError:
-    st.error("Error loading the model. Please check if the file exists and is not corrupted.")
+    model = load_model(MODEL_PATH)
+except Exception as e:
+    st.error(f"❌ Error loading model: {e}")
+    st.stop()
 
-# Preprocess each frame to fit the model input
+# -------------------------------
+# Frame Preprocessing
+# -------------------------------
 def preprocess_frame(frame):
-    frame_resized = cv2.resize(frame, (224, 224))  # Resize frame to the input size expected by the model
-    frame_normalized = frame_resized / 255.0       # Normalize pixel values
-    frame_reshaped = np.expand_dims(frame_normalized, axis=0)  # Reshape to fit model input shape
-    return frame_reshaped
+    frame = cv2.resize(frame, (224, 224))
+    frame = frame.astype("float32") / 255.0
+    frame = np.expand_dims(frame, axis=0)
+    return frame
 
-# Predict if a frame is real (1) or fake (0)
+# -------------------------------
+# Frame Prediction
+# -------------------------------
 def predict_frame(frame):
-    processed_frame = preprocess_frame(frame)
-    prediction = model.predict(processed_frame)
-    predicted_class = 1 if prediction[0][0] > 0.5 else 0  # Assuming model outputs 1 for real, 0 for fake
-    return predicted_class, prediction[0][0]  # Return the class and confidence
+    processed = preprocess_frame(frame)
+    prediction = model.predict(processed, verbose=0)
+    confidence = float(prediction[0][0])
+    predicted_class = 1 if confidence > 0.5 else 0
+    return predicted_class, confidence
 
-# Process video to classify frames based on FPS
+# -------------------------------
+# Video Classification
+# -------------------------------
 def classify_video(video_path, frame_skip=10):
     cap = cv2.VideoCapture(video_path)
-    frame_count = 0
-    results = []
 
-    # Calculate FPS to dynamically determine frame skipping
-    fps = cap.get(cv2.CAP_PROP_FPS)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    total_frames = max(total_frames, 1)
 
-    # Streamlit progress bar
     progress_bar = st.progress(0)
+    results = []
+    frame_count = 0
 
-    # Process each frame
     while cap.isOpened():
-        ret, frame = cap.read()  # Read one frame
+        ret, frame = cap.read()
         if not ret:
             break
 
         frame_count += 1
-        # Update progress bar
         progress_bar.progress(min(frame_count / total_frames, 1.0))
 
-        # Only process every 'frame_skip' frame
         if frame_count % frame_skip == 0:
-            predicted_class, confidence = predict_frame(frame)
-            results.append((predicted_class, confidence))
+            pred_class, confidence = predict_frame(frame)
+            results.append((pred_class, confidence))
 
     cap.release()
     progress_bar.empty()
 
-    # Count the majority result ('real' or 'fake')
-    real_count = sum(1 for result in results if result[0] == 1)  # Count number of real frames
-    fake_count = sum(1 for result in results if result[0] == 0)  # Count number of fake frames
+    if len(results) == 0:
+        return "unknown", 0, 0, 0, 0, total_frames
 
-    # Average confidence scores for real and fake
-    avg_conf_real = np.mean([result[1] for result in results if result[0] == 1]) if real_count > 0 else 0
-    avg_conf_fake = np.mean([result[1] for result in results if result[0] == 0]) if fake_count > 0 else 0
+    real_count = sum(1 for r in results if r[0] == 1)
+    fake_count = sum(1 for r in results if r[0] == 0)
 
-    # Determine the final result: majority voting
-    video_result = 'real' if real_count > fake_count else 'fake'
+    avg_conf_real = np.mean([r[1] for r in results if r[0] == 1]) if real_count else 0
+    avg_conf_fake = np.mean([r[1] for r in results if r[0] == 0]) if fake_count else 0
+
+    video_result = "real" if real_count > fake_count else "fake"
 
     return video_result, real_count, fake_count, avg_conf_real, avg_conf_fake, total_frames
 
-# Streamlit app
-st.title('🎥 DeepFake Detection 🎭')
-st.markdown("Welcome to the DeepFake Detection, where you can upload a video to determine whether it is real or fake.")
+# -------------------------------
+# Streamlit UI
+# -------------------------------
+st.title("🎥 DeepFake Detection 🎭")
+st.markdown(
+    "Upload a video and this system will analyze frames using a deep learning model "
+    "to determine whether the video is **Real** or **Fake**."
+)
 
-# Upload a video file
-uploaded_file = st.file_uploader("📁 Upload your video file:", type=["mp4", "mov", "avi"])
+uploaded_file = st.file_uploader(
+    "📁 Upload your video file",
+    type=["mp4", "mov", "avi"]
+)
 
 if uploaded_file is not None:
-    # Save uploaded video to a temporary file
     with NamedTemporaryFile(delete=False) as temp_file:
         temp_file.write(uploaded_file.read())
-        temp_filename = temp_file.name
+        temp_video_path = temp_file.name
 
-    # Classify the uploaded video
-    with st.spinner('🔍 Analyzing the video, please wait...'):
-        video_result, real_count, fake_count, avg_conf_real, avg_conf_fake, total_frames = classify_video(temp_filename, frame_skip=10)
+    with st.spinner("🔍 Analyzing video... Please wait"):
+        (
+            video_result,
+            real_count,
+            fake_count,
+            avg_conf_real,
+            avg_conf_fake,
+            total_frames
+        ) = classify_video(temp_video_path, frame_skip=10)
 
-    # Display the results
-    st.markdown(f"## 🏁 **Results**")
-    if video_result == 'real':
-        st.success(f"✅ The video is classified as **Real**.")
+    st.markdown("## 🏁 Results")
+
+    if video_result == "real":
+        st.success("✅ The video is classified as **REAL**")
+    elif video_result == "fake":
+        st.error("❌ The video is classified as **FAKE**")
     else:
-        st.error(f"❌ The video is classified as **Fake**.")
+        st.warning("⚠ Unable to classify the video")
 
-    st.write("### 📊 **Detailed Statistics**")
+    st.markdown("### 📊 Frame Analysis")
     col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Real Frames Count", real_count)
-        st.metric("Fake Frames Count", fake_count)
 
-    # Optionally, display the uploaded video
-    st.markdown("### 🎬 **Uploaded Video**")
+    with col1:
+        st.metric("Real Frames", real_count)
+        st.metric("Fake Frames", fake_count)
+
+    with col2:
+        st.metric("Avg Real Confidence", f"{avg_conf_real:.2f}")
+        st.metric("Avg Fake Confidence", f"{avg_conf_fake:.2f}")
+
+    st.markdown("### 🎬 Uploaded Video")
     st.video(uploaded_file)
 
