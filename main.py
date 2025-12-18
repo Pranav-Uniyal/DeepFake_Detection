@@ -7,7 +7,7 @@ from tempfile import NamedTemporaryFile
 
 # Load the pre-trained deepfake detection model
 try:
-    model_path = r'C:\Users\loku0\OneDrive\Desktop\DeepFake\DeepFake_Model.h5' #Enter the path of model from your directory
+    model_path = r'dfd-model.h5' #Enter the path of model from your directory
     model = load_model(model_path)
 except OSError:
     st.error("Error loading the model. Please check if the file exists and is not corrupted.")
@@ -103,3 +103,4 @@ if uploaded_file is not None:
     # Optionally, display the uploaded video
     st.markdown("### 🎬 **Uploaded Video**")
     st.video(uploaded_file)
+
