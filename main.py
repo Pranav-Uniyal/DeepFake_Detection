@@ -33,7 +33,7 @@ except Exception as e:
 # Frame Preprocessing
 # -------------------------------
 def preprocess_frame(frame):
-    frame = cv2.resize(frame, (224, 224))
+    frame = cv2.resize(frame, (256, 256))
     frame = frame.astype("float32") / 255.0
     frame = np.expand_dims(frame, axis=0)
     return frame
@@ -140,4 +140,5 @@ if uploaded_file is not None:
 
     st.markdown("### 🎬 Uploaded Video")
     st.video(uploaded_file)
+
 
