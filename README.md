@@ -1,10 +1,10 @@
 
-# 🎭 DeepFake Detection System
+# 🎭 DeepFake Detection System | [Live](https://deepfakedetection-fc7ehhq8b5nkmxtu3tswez.streamlit.app/)
 
 A **Streamlit-based web application** to detect deepfake videos using a CNN model. This tool analyzes frames of a video and determines whether the video is **real** or **fake** using majority voting and confidence scoring.
 
 ---
-# [Kaggle Notebook Link](https://www.kaggle.com/code/fall2fire/deepfake-detection-96-accuracy)
+# Kaggle Notebook Link
 [<img width="511" height="240" alt="image" src="https://github.com/user-attachments/assets/2760b98e-ac25-44a9-be3d-08c2dde64d25" />](https://www.kaggle.com/code/fall2fire/deepfake-detection-96-accuracy)
 
 ---
