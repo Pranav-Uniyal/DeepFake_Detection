@@ -4,7 +4,8 @@
 A **Streamlit-based web application** to detect deepfake videos using a CNN model. This tool analyzes frames of a video and determines whether the video is **real** or **fake** using majority voting and confidence scoring.
 
 ---
-# Kaggle Notebook Link
+
+## Kaggle Notebook Link
 [<img width="511" height="240" alt="image" src="https://github.com/user-attachments/assets/2760b98e-ac25-44a9-be3d-08c2dde64d25" />](https://www.kaggle.com/code/fall2fire/deepfake-detection-96-accuracy)
 
 ---
@@ -18,7 +19,7 @@ Try out the application by uploading a `.mp4`, `.mov`, or `.avi` file and let th
 
 ---
 
-## 🚀 Features
+##  Features
 
 - 📤 Upload and analyze video files in real-time.
 - 🧠 Deep learning-based frame-level prediction using a CNN model.
@@ -30,7 +31,7 @@ Try out the application by uploading a `.mp4`, `.mov`, or `.avi` file and let th
 
 ## 🛠️ Tech Stack
 
-- Python 🐍
+- Python 
 - TensorFlow / Keras
 - OpenCV
 - NumPy
@@ -76,14 +77,10 @@ streamlit run main.py
 ```
 Deepfake-Detection(Repo)
 │
-├── main.py  # Main Streamlit app
-├── dfd-model.h5                       # Pre-trained CNN model
-└── README.md                               # Project documentation
+├── main.py                 # Main Streamlit app
+├── dfd-model.h5            # Pre-trained CNN model
+└── README.md               # Project documentation
 ```
-
----
-## Download the Model
-Releases-[Download](https://github.com/Pranav-Uniyal/DeepFake_Detection/releases/tag/model)
 
 ---
 
@@ -118,7 +115,7 @@ After uploading a video, the app displays:
 
 ## 📌 Notes
 
-- Ensure your model accepts `(224, 224, 3)` input shape.
+- Ensure your model accepts `(256, 256, 3)` input shape.
 - The app assumes binary classification: **1 = Real**, **0 = Fake**.
 
 ---
@@ -129,7 +126,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## 🙌 Acknowledgements
+## Acknowledgements
 
 - TensorFlow/Keras
 - Streamlit
